@@ -2,10 +2,10 @@ const { User } = require("../models/user.model")
 const bcrypt=require("bcrypt")
 const jwt=require("jsonwebtoken")
 const login= async (req,res)=>{
-    console.log(req.body,"check")
+   // console.log(req.body,"check")
     try{
       const {email,password}=req.body
-      console.log(email,"check")
+     // console.log(email,"check")
       if(!email||!password){
         return res.status(400).json({message:"please fill all fields"})
       }
@@ -65,4 +65,54 @@ const fetch=(req,res)=>{
     return res.status(500).json({message:err.message})
 }
 }
-module.exports={login,singup,fetch}
+const logout=(req,res)=>{
+  
+try{
+ res.clearCookie("accesstoken",{
+  httpOnly:true,
+  secure:process.env.NODE_ENV=="production"
+ })
+  res.clearCookie("refreshtoken",{
+  httpOnly:true,
+  secure:process.env.NODE_ENV=="production",
+   path:"/api/refresh"
+ })
+ console.log("logout executing")
+ return res.status(200).json({message:"ok"})
+}catch(err){
+    return res.status(500).json({message:err.message})
+}
+}
+const refresh=async(req,res)=>{
+try{
+const {refreshtoken}=req.cookies
+if(!refreshtoken){
+  return res.status(400).json({message:"refresh token missing"})
+}
+const payload=jwt.verify(refreshtoken,process.env.jwt_refresh_secret)
+if(payload.type!=="refresh"){
+  return res.status(400).json({message:"token type not refresh"})
+}
+const id=payload.sub
+const user=await User.findById(id)
+if(!user){
+  res.clearCookie("refreshtoken",{
+  httpOnly:true,
+  secure:process.env.NODE_ENV=="production",
+   path:"/api/refresh"
+ })
+ return res.status(400).json({message:"user not found"})
+}
+const accesstoken=jwt.sign({sub:user._id,role:user.role},process.env.jwt_access_secret,{expiresIn:"15m"})
+      res.cookie("accesstoken",accesstoken,{
+        httpOnly:true,
+        secure:process.env.NODE_ENV=="production",
+        maxAge:15*60*100
+      })
+return res.status(200).json({ message: "new access token generated" })
+
+}catch(err){
+    return res.status(500).json({message:err.message})
+}
+}
+module.exports={login,singup,fetch,logout,refresh}
