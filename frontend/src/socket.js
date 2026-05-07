@@ -3,6 +3,19 @@ export const socket=io("http://localhost:5000",{
     withCredentials:true,
     autoConnect:false
 })
-export const connectSocket=()=>{
-    if(!socket.connected) socket.connect()
-}
+export const connectSocket = () => {
+  const guest = JSON.parse(localStorage.getItem("guest"));
+
+  if (!socket.connected) {
+    if (guest) {
+      socket.auth = {
+        guestId: guest.id,
+        guestName: guest.name,
+      };
+    } else {
+      socket.auth = {}; // clear guest auth
+    }
+
+    socket.connect();
+  }
+};

@@ -1,6 +1,7 @@
 const { User } = require("../models/user.model")
 const bcrypt=require("bcrypt")
 const jwt=require("jsonwebtoken")
+const { socket } = require("../../frontend/src/socket")
 const login= async (req,res)=>{
    // console.log(req.body,"check")
     try{
@@ -58,6 +59,7 @@ try{
 }
 }
 const fetch=(req,res)=>{
+  socket.disconnect()
   try{
     const user=req.user
     return res.status(200).json({user})
@@ -66,7 +68,7 @@ const fetch=(req,res)=>{
 }
 }
 const logout=(req,res)=>{
-  
+  socket.disconnect()
 try{
  res.clearCookie("accesstoken",{
   httpOnly:true,
@@ -77,7 +79,7 @@ try{
   secure:process.env.NODE_ENV=="production",
    path:"/api/refresh"
  })
- console.log("logout executing")
+
  return res.status(200).json({message:"ok"})
 }catch(err){
     return res.status(500).json({message:err.message})

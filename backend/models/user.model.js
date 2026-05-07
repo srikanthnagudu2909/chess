@@ -10,7 +10,9 @@ const userSchema=mongoose.Schema({
         wins:{type:Number,default:0},
         losses:{type:Number,default:0},
         draws:{type:Number,default:0},
-        gamesplayes:{type:Number,default:0},
+        gamesPlayed:{type:Number,default:0},
+        currentStreak:{type:Number,default:0},
+        bestStreak:{type:Number,default:0}
     }
 
 

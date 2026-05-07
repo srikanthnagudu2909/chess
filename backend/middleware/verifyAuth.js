@@ -4,13 +4,14 @@ const verifyAuth=async(req,res,next)=>{
 try{
 const {accesstoken}=req.cookies
 if(!accesstoken){
-    return res.status(401).json({message:err.message})
+    return res.status(401).json({message:"unauthorised"})
 }
 let plaload
 try{
  plaload=jwt.verify(accesstoken,process.env.jwt_access_secret)
 }
 catch(err){
+
     return res.status(401).json({message:err.message})
 }
 const id=plaload.sub
@@ -23,8 +24,9 @@ if(plaload.role!==user.role){
 }
 req.user=user
 next()
-}catch(err){
-    return res.status(500).json({message:err.message})
+}catch(e){
+
+    return res.status(500).json({message:e.message})
 }
 }
 module.exports={verifyAuth}

@@ -1,0 +1,5 @@
+const express=require("express")
+const { leaderboard } = require("../controller/leaderboard.controller")
+const leaderboardrouter=express.Router()
+leaderboardrouter.get("/leaderboard",leaderboard)
+module.exports=({leaderboardrouter})
