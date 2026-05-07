@@ -9,7 +9,6 @@ const http=require("http")
 
 const jwt=require("jsonwebtoken")
 const { User } = require("./models/user.model")
-const { socket } = require("../frontend/src/socket")
 const { Chess } = require("chess.js")
 const { leaderboardrouter } = require("./routes/leaderboard.routes")
 const {Game}=require("./models/game.model")
@@ -17,7 +16,6 @@ const { env } = require("process")
 const { ok } = require("assert")
 const { verifyAuth } = require("./middleware/verifyAuth")
 const parser = require("./utilities/upload")
-const client=process.env.client_url
 
 const app = express()
 
@@ -42,7 +40,7 @@ const mongo_url = process.env.mongo_url
 const server=http.createServer(app)
 const io=new Server (server,{
   cors:{
-    origin:["http://localhost:5173"||client],
+    origin:["http://localhost:5173"],
     credentials:true
   }
 })
