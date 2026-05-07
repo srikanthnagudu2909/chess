@@ -1,6 +1,7 @@
 require("dotenv").config()
 const express = require("express")
 const cors = require("cors")
+const cookieParser = require("cookie-parser")
 const { authRouter } = require("./routes/auth.rotues")
 const mongoose = require("mongoose")
 const{Server}=require("socket.io")
@@ -16,12 +17,14 @@ const { env } = require("process")
 const { ok } = require("assert")
 const { verifyAuth } = require("./middleware/verifyAuth")
 const parser = require("./utilities/upload")
+const client=process.env.client_url
 
 const app = express()
 
 app.use(cors({origin:["http://localhost:5173"],
   credentials:true}))
 app.use(express.json())
+app.use(cookieParser())
 app.use("/api", authRouter)
 app.use("/api",leaderboardrouter)
 app.post("/api/upload", verifyAuth, parser.single("file"), (req, res) => {
@@ -39,7 +42,7 @@ const mongo_url = process.env.mongo_url
 const server=http.createServer(app)
 const io=new Server (server,{
   cors:{
-    origin:["http://localhost:5173"],
+    origin:["http://localhost:5173"||client],
     credentials:true
   }
 })
